@@ -1,0 +1,68 @@
+#!/usr/bin/python3
+
+"""
+    $Kayyum - Operate on DFSnedir service containers
+    Functionalities:
+        - Run bunch of service container
+        - Build new container image
+        - Remove container image
+        - Stop bunch of service container
+        - Remove service containers
+    
+    Architecture:
+        Kayyum calls the related operation script from lib directory for the given task.
+        Some script may requires arguments. So, kayyum has to give correct argument for compelite the task successfully.
+"""
+
+import os
+import sys
+import subprocess
+
+libdir = "./lib/dev/"
+
+def build_container_image():
+    print("some fancy build function codes")
+    path = os.path.abspath(libdir + "build_container.sh")
+    subprocess.call(path)
+    pass
+
+def run_service_container():
+    print("some fancy run function codes")
+    path = os.path.abspath(libdir + "run_container.sh")
+    subprocess.call(path)
+    pass
+
+def usage_print():
+    print("Usage:", sys.argv[0], "<operation>")
+    ops = list(operations.keys())
+    print("\nOperations: ", sep="", end="")
+    
+    for op in ops[:-1]:
+        print(op, end=", ")
+
+    print(ops[-1])
+
+operations = {
+    "run": [run_service_container],
+    "build": [build_container_image]
+}
+
+def main():
+    # Call without argument
+    if len(sys.argv) < 2:
+        usage_print()
+        exit(0)
+    
+    op = sys.argv[1]
+    op = op.lower()
+
+    if op in list(operations.keys()):
+        for func in operations[op]:
+            func()
+    else:
+        print("This operation doesn't supported!")
+        usage_print()
+        exit(0)
+
+if __name__ == "__main__":
+    main()

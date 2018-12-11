@@ -1,8 +1,12 @@
 import time
 import os
 import socket
+import rpyc
+from multiprocessing import Process
+from rpyc.utils.server import ThreadedServer
+import service
 
-def main():
+def test():
     port = int(os.environ["TESTPORT"])
     host = os.environ["HOSTNAME"]
 
@@ -18,5 +22,15 @@ def main():
         conn.send(b'Received your connection')
         conn.close()
 
+def foo():
+    port = int(os.environ["PORT"])
+    rypc_server = ThreadedServer(service.DFSnedir_service, port=port)
+    rypc_server.start()
+
 if __name__ == "__main__":
-    main()
+    ptest = Process(target=test)
+    ptest2 = Process(target=foo)
+    ptest.start()
+    ptest2.start()
+    ptest.join()
+    ptest2.join()
