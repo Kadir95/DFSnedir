@@ -27,41 +27,29 @@ class Passthrough(Operations):
 
     def access(self, path, mode):
         print("FileSystem method: access\n")
-        full_path = self._full_path(path)
-        if not os.access(full_path, mode):
-            raise FuseOSError(errno.EACCES)
+        return self.conn.root.access(path, mode)
 
     chmod = None
     chown = None
 
     def getattr(self, path, fh=None):
         print("FileSystem method: getattr\n")
-        full_path = self._full_path(path)
-        st = os.lstat(full_path)
-        return dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
-                     'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
+        return self.conn.root.getattr(path, fh)
 
     def readdir(self, path, fh):
         print("FileSystem method: readdir\n")
-        full_path = self._full_path(path)
-
-        dirents = ['.', '..']
-        if os.path.isdir(full_path):
-            dirents.extend(os.listdir(full_path))
-        for r in dirents:
-            yield r
+        return self.conn.root.readdir(path, fh)
 
     readlink = None
     mknod = None
 
     def rmdir(self, path):
         print("FileSystem method: rmdir\n")
-        full_path = self._full_path(path)
-        return os.rmdir(full_path)
+        return self.conn.root.rmdir(path)
 
     def mkdir(self, path, mode):
         print("FileSystem method: mkdir\n")
-        return os.mkdir(self._full_path(path), mode)
+        return self.conn.root.mkdir(path, mode)
 
     statfs = None
     unlink = None
@@ -69,7 +57,7 @@ class Passthrough(Operations):
 
     def rename(self, old, new):
         print("FileSystem method: rename\n")
-        return os.rename(self._full_path(old), self._full_path(new))
+        return self.conn.root.rename(old, new)
 
     link = None
     utimens = None
@@ -77,31 +65,27 @@ class Passthrough(Operations):
     # File methods
     # ============
 
-    def open(self, patüh, flags):
+    def open(self, path, flags):
         print("File method: open\n")
-        full_path = self._full_path(path)
-        return os.open(full_path, flags)
+        return self.conn.root.open(path, flags)
 
     def create(self, path, mode, fi=None):
         print("File method: creat\n")
-        full_path = self._full_path(path)
-        return os.open(full_path, os.O_WRONLY | os.O_CREAT, mode)
+        return self.conn.root.open(path, os.O_WRONLY | os.O_CREAT, mode)
 
     def read(self, path, length, offset, fh):
         print("File method: read\n")
-        os.lseek(fh, offset, os.SEEK_SET)
-        return os.read(fh, length)
+        return self.conn.root.read(fh, length)
 
     def write(self, path, buf, offset, fh):
         print("File method: write\n")
-        os.lseek(fh, offset, os.SEEK_SET)
-        return os.write(fh, buf)
+        return self.conn.root.write(fh, buf)
 
     truncate = None
 
     def flush(self, path, fh):
         print("File method: flush\n")
-        return os.fsync(fh)
+        return self.conn.root.fsync(fh)
 
     release = None
     fsync = None 
