@@ -7,6 +7,8 @@ from multiprocessing import Process
 from rpyc.utils.server import ThreadedServer
 import service
 
+rpyc.core.protocol.DEFAULT_CONFIG['allow_pickle'] = True
+
 slave_dict = "/data/slave_dict"
 
 def test():
