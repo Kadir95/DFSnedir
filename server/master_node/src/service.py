@@ -50,6 +50,10 @@ class DFSnedir_master_service(rpyc.Service):
 		# slave_machine["stats"]["ip"], slave_machine["stats"]["port"]
 		return slave_machine
 
+	def _select_rand_slaveID(self):
+		slaves = self.slave_server_table.keys()
+		return random.choice(slaves)
+
 	def on_connect(self, conn):
 		self.slave_server_table_file = conn._config["slave_dict"]
 		self.file_server_table_file = conn._config["file_dict"]
@@ -101,8 +105,7 @@ class DFSnedir_master_service(rpyc.Service):
 		return conn.root.rmdir(path)
 
 	def exposed_mkdir(self, path, mode):
-		slaves = self.slave_server_table.keys()
-		slaveID = random.choice(slaves)
+		slaveID = self._select_rand_slaveID()
 		self.file_server_table[path] = [slaveID]
 		slave = self.slave_server_table[slaveID]
 		conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
