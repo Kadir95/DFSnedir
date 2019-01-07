@@ -28,7 +28,27 @@ def test():
         conn.close()
 
 def heart_beat_controller():
-    pass
+    interval = int(os.environ["HEART_BEAT_SEC"]) * 2
+    while True:
+        time.sleep(interval / 2)
+        curr_time = time.time()
+        fd = open(slave_dict, "rb")
+        s_dict = pickle.load(fd)
+        s_list = s_dict.values()
+        fd.close()
+
+        del_list = []
+        for s_ in s_list:
+            timeout = curr_time - s_["last_heart_beat"]
+            if timeout > interval:
+                del_list.append(s_["stats"]["id"])
+        
+        if len(del_list) > 0:
+            for i in del_list:
+                s_dict.pop(i, None)
+            fd = open(slave_dict, "wb")
+            pickle.dump(s_dict, fd)
+            fd.close()
 
 def foo():
     port = int(os.environ["PORT"])
@@ -42,7 +62,6 @@ def foo():
     rypc_server.start()
 
 if __name__ == "__main__":
-
     if not os.path.isdir(os.path.dirname(slave_dict)):
         os.makedirs(os.path.dirname(slave_dict))
 
@@ -52,9 +71,14 @@ if __name__ == "__main__":
         pickle.dump(temp, fd)
         fd.close()
 
-    ptest = Process(target=test)
-    ptest2 = Process(target=foo)
-    ptest.start()
-    ptest2.start()
-    ptest.join()
-    ptest2.join()
+    test_port_p = Process(target=test)
+    rpyc_p = Process(target=foo)
+    master_heart_beat_con_p = Process(target=heart_beat_controller)
+
+    test_port_p.start()
+    rpyc_p.start()
+    master_heart_beat_con_p.start()
+
+    test_port_p.join()
+    rpyc_p.join()
+    master_heart_beat_con_p.join()

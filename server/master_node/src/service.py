@@ -59,10 +59,3 @@ class DFSnedir_master_service(rpyc.Service):
             conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
             result_text += conn.root.echo(text) + "\n"
         return result_text
-
-
-
-
-
-
-    

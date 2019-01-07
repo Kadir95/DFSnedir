@@ -1,0 +1,1 @@
+sudo docker run --network nedir_network --ip 172.20.0.3 dfsnedir_slave &

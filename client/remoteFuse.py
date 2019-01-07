@@ -10,9 +10,8 @@ import rpyc
 from fuse import FUSE, FuseOSError, Operations
 
 class Passthrough(Operations):
-    def __init__(self, root):
-        self.root = root
-        #self.conn = rpyc.connect("172.20.0.2", 11223)
+    def __init__(self):
+        self.conn = rpyc.connect("172.20.0.2", 11223)
 
     # Helpers
     # =======
@@ -107,13 +106,23 @@ class Passthrough(Operations):
     #release
     #fsync
 
+def mount(mountpoint):
+    abs_path = os.path.abspath(mountpoint)
+    if not os.path.isdir(abs_path):
+        print("Mount point must be exist")
+        sys.exit(0)
+    if len(os.listdir(abs_path)) > 0:
+        print("Mount point must be empty")
+        sys.exit(0)
+    
+    FUSE(Passthrough(), mountpoint, nothreads=True, foreground=True)
 
-def main(mountpoint, root):
-    FUSE(Passthrough(root), mountpoint, nothreads=True, foreground=True)
+def usage():,
+    print(sys.argv[0], "<mount point>")
 
 if __name__ == '__main__':
-    main(sys.argv[2], sys.argv[1])
-
-
-#python myfs.py /Users/ilkay/Desktop/Dist_Proj/lab02_summary_codes/real /Users/ilkay/Desktop/Dist_Proj/lab02_summary_codes/virtual
-#python myfs.py real virtual
+    if len(sys.argv) < 2:
+        usage()
+        sys.exit(0)
+    
+    mount(sys.argv[1])
