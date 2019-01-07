@@ -25,12 +25,27 @@ class DFSnedir_master_service(rpyc.Service):
         pickle.dump(self.slave_server_table, fd)
         fd.close()
 
+    def _refresh_file_dict(self):
+        if os.path.getsize(self.file_server_table_file) > 0:
+            fd = open(self.file_server_table_file, "rb")
+            self.file_server_table = pickle.load(fd)
+            fd.close()
+        else: 
+            self.file_server_table = {}
+
+    def _flush_file_dict(self):
+        fd = open(self.file_server_table_file, "wb")
+        pickle.dump(self.file_server_table, fd)
+        fd.close()
+
     def _abs_path(self, fpath):
         raise NotImplemented
 
     def on_connect(self, conn):
         self.slave_server_table_file = conn._config["slave_dict"]
+        self.file_server_table_file = conn._config["file_dict"]
         self._refresh_slave_dict()
+        self._refresh_file_dict()
 
     def exposed_echo(self, text):
         return str(text) + " //From docker"

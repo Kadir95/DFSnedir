@@ -10,6 +10,7 @@ import service
 rpyc.core.protocol.DEFAULT_CONFIG['allow_pickle'] = True
 
 slave_dict = "/data/slave_dict"
+file_dict = "/data/file_dict"
 
 def test():
     port = int(os.environ["TESTPORT"])
@@ -57,6 +58,7 @@ def foo():
             port=port,
             protocol_config={
                     "slave_dict":slave_dict,
+                    "file_dict":file_dict,
                     "allow_pickle":True
                     })
     rypc_server.start()
