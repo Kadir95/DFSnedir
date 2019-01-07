@@ -1,9 +1,9 @@
 """
-    DFSnedir_service class contains the functions that provided by containers RPyC server.
+	DFSnedir_service class contains the functions that provided by containers RPyC server.
 
-    !! Attention: If you want to reach the function by RPC call, you have to put "exposed_" prefix to your function
-        Ex: exposed_echo -> conn.root.echo("some arguments") // It will run
-            echo         -> conn.root.echo("some arguments") // It won't run
+	!! Attention: If you want to reach the function by RPC call, you have to put "exposed_" prefix to your function
+		Ex: exposed_echo -> conn.root.echo("some arguments") // It will run
+			echo         -> conn.root.echo("some arguments") // It won't run
 """
 
 import rpyc
@@ -13,13 +13,13 @@ import pickle
 d_path = "/data/slave_data/"
 
 class DFSnedir_service(rpyc.Service):
-    def _abs_path(self, u_path):
-        if u_path.startswith("/"):
-            u_path = u_path[1:]
-        return os.path.join(d_path, u_path)
+	def _abs_path(self, u_path):
+		if u_path.startswith("/"):
+			u_path = u_path[1:]
+		return os.path.join(d_path, u_path)
 
-    def exposed_echo(self, text):
-        return text + " //" + os.environ["HOSTNAME"]
+	def exposed_echo(self, text):
+		return text + " //" + os.environ["HOSTNAME"]
 
 	def exposed_open(self, path, flags, mode):
 		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)

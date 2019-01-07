@@ -63,15 +63,19 @@ def foo():
                     })
     rypc_server.start()
 
-if __name__ == "__main__":
-    if not os.path.isdir(os.path.dirname(slave_dict)):
-        os.makedirs(os.path.dirname(slave_dict))
+def verify_or_create(file_path):
+    if not os.path.isdir(os.path.dirname(file_path)):
+        os.makedirs(os.path.dirname(file_path))
 
-    if not os.path.isfile(slave_dict):
+    if not os.path.isfile(file_path):
         temp = {}
-        fd = open(slave_dict, "wb")
+        fd = open(file_path, "wb")
         pickle.dump(temp, fd)
         fd.close()
+
+if __name__ == "__main__":
+    verify_or_create(slave_dict)
+    verify_or_create(file_dict)
 
     test_port_p = Process(target=test)
     rpyc_p = Process(target=foo)

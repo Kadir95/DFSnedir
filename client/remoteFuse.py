@@ -92,6 +92,7 @@ class Passthrough(Operations):
 
 def mount(mountpoint):
     abs_path = os.path.abspath(mountpoint)
+    print(abs_path, os.path.isdir(abs_path))
     if not os.path.isdir(abs_path):
         print("Mount point must be exist")
         sys.exit(0)
@@ -101,7 +102,7 @@ def mount(mountpoint):
     
     FUSE(Passthrough(), mountpoint, nothreads=True, foreground=True)
 
-def usage():,
+def usage():
     print(sys.argv[0], "<mount point>")
 
 if __name__ == '__main__':
