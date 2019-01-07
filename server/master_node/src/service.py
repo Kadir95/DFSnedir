@@ -44,7 +44,11 @@ class DFSnedir_master_service(rpyc.Service):
 
 	def _find_slave(self, path):
 		self._refresh_file_dict()
-		slave_machine_list = self.file_server_table[path]
+		slave_machine_list = self.file_server_table.get(path)
+		if not slave_machine_list:
+			self.file_server_table[path] = [self._select_rand_slaveID()]
+			slave_machine_list = self.file_server_table.get(path)
+			self._flush_file_dict()
 		slaveID = slave_machine_list[0]
 		slave_machine = self.slave_server_table[slaveID]
 		# slave_machine["stats"]["ip"], slave_machine["stats"]["port"]
@@ -52,7 +56,7 @@ class DFSnedir_master_service(rpyc.Service):
 
 	def _select_rand_slaveID(self):
 		slaves = self.slave_server_table.keys()
-		return random.choice(slaves)
+		return random.choice(list(slaves))
 
 	def on_connect(self, conn):
 		self.slave_server_table_file = conn._config["slave_dict"]
@@ -118,14 +122,11 @@ class DFSnedir_master_service(rpyc.Service):
 		directory = []
 		for slave in slaves:
 			conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
-			content = conn.root.readdir(path)
+			content = conn.root.readdir(path, fh)
 			directory.append(c for c in content if c not in directory)
 		return directory
 
 	def exposed_getattr(self, path, fh=None):
 		slave = self._find_slave(path)
 		conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
-		st = conn.root.lstat(path)
-		return dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
-														'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size',
-														'st_uid'))
+		return conn.root.getattr(path, fh)
