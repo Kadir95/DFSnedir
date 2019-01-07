@@ -119,3 +119,10 @@ class DFSnedir_master_service(rpyc.Service):
 			directory.append(c for c in content if c not in directory)
 		return directory
 
+	def exposed_getattr(self, path, fh=None):
+		slave = self._find_slave(path)
+		conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
+		st = conn.root.lstat(path)
+		return dict((key, getattr(st, key)) for key in ('st_atime', 'st_ctime',
+														'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size',
+														'st_uid'))
