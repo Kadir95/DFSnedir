@@ -1,3 +1,4 @@
+#Slave Node
 FROM python:3
 ENV TESTPORT=19199
 ENV PORT=11223

@@ -18,19 +18,15 @@ import os
 import sys
 import subprocess
 
-libdir = "./lib/dev/"
+libdir = "./lib/"
 
 def build_container_image():
-    print("some fancy build function codes")
     path = os.path.abspath(libdir + "build_container.sh")
     subprocess.call(path)
-    pass
 
 def run_service_container():
-    print("some fancy run function codes")
     path = os.path.abspath(libdir + "run_container.sh")
     subprocess.call(path)
-    pass
 
 def usage_print():
     print("Usage:", sys.argv[0], "<operation>")
