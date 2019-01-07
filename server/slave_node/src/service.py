@@ -20,4 +20,3 @@ class DFSnedir_service(rpyc.Service):
 
     def exposed_echo(self, text):
         return text + " //" + os.environ["HOSTNAME"]
-    
