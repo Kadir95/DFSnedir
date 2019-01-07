@@ -26,9 +26,7 @@ class DFSnedir_master_service(rpyc.Service):
         fd.close()
 
     def _abs_path(self, fpath):
-        if fpath.startswith("/"):
-            fpath = fpath[1:]
-        return os.path.join(path, fpath)
+        raise NotImplemented
 
     def on_connect(self, conn):
         self.slave_server_table_file = conn._config["slave_dict"]

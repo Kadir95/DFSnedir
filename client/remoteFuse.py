@@ -31,8 +31,8 @@ class Passthrough(Operations):
         if not os.access(full_path, mode):
             raise FuseOSError(errno.EACCES)
 
-    #chmod
-    #chown
+    chmod = None
+    chown = None
 
     def getattr(self, path, fh=None):
         print("FileSystem method: getattr\n")
@@ -51,8 +51,8 @@ class Passthrough(Operations):
         for r in dirents:
             yield r
 
-    #readlink
-    #mknod
+    readlink = None
+    mknod = None
 
     def rmdir(self, path):
         print("FileSystem method: rmdir\n")
@@ -63,21 +63,21 @@ class Passthrough(Operations):
         print("FileSystem method: mkdir\n")
         return os.mkdir(self._full_path(path), mode)
 
-    #statfs
-    #unlink
-    #symlink
+    statfs = None
+    unlink = None
+    symlink = None
 
     def rename(self, old, new):
         print("FileSystem method: rename\n")
         return os.rename(self._full_path(old), self._full_path(new))
 
-    #link
-    #utimens
+    link = None
+    utimens = None
 
     # File methods
     # ============
 
-    def open(self, path, flags):
+    def open(self, patüh, flags):
         print("File method: open\n")
         full_path = self._full_path(path)
         return os.open(full_path, flags)
@@ -97,14 +97,14 @@ class Passthrough(Operations):
         os.lseek(fh, offset, os.SEEK_SET)
         return os.write(fh, buf)
 
-    #truncate
+    truncate = None
 
     def flush(self, path, fh):
         print("File method: flush\n")
         return os.fsync(fh)
 
-    #release
-    #fsync
+    release = None
+    fsync = None 
 
 def mount(mountpoint):
     abs_path = os.path.abspath(mountpoint)
