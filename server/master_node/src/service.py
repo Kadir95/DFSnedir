@@ -38,22 +38,26 @@ class DFSnedir_master_service(rpyc.Service):
         return str(text) + " //From docker"
     
     def exposed_add_slave(self, slave_stats):
+        self._refresh_slave_dict()
         self.slave_server_table[slave_stats["id"]] = {"stats":slave_stats, "last_heart_beat":time.time()}
         self._flush_slave_dict()
     
     def exposed_get_slaves(self):
-        return self.slave_server_table
+        self._refresh_slave_dict()
+        return str(self.slave_server_table)
 
     def exposed_heart_beat(self, slave_stats):
+        self._refresh_slave_dict()
         self.slave_server_table[slave_stats["id"]]["last_heart_beat"] = time.time()
         self._flush_slave_dict()
     
     def exposed_slave_echo(self, text):
+        self._refresh_slave_dict()
         slaves_list = self.slave_server_table.values()
         result_text = ""
         for slave in slaves_list:
             conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
-            result_text += conn.root.echo(text)
+            result_text += conn.root.echo(text) + "\n"
         return result_text
 
 

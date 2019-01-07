@@ -27,6 +27,9 @@ def test():
         conn.send(b'Received your connection')
         conn.close()
 
+def heart_beat_controller():
+    pass
+
 def foo():
     port = int(os.environ["PORT"])
     rypc_server = ThreadedServer(

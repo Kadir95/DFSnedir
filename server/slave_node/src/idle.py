@@ -49,7 +49,7 @@ def connect_master():
 
 def get_slave_stats():
     return {
-            "id":os.environ["GPG_KEY"],
+            "id":os.environ["HOSTNAME"],
             "ip":socket.gethostbyname(socket.gethostname()),
             "port":int(os.environ["PORT"])
     }
