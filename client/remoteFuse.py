@@ -27,7 +27,9 @@ class Passthrough(Operations):
 
     def access(self, path, mode):
         print("FileSystem method: access\n")
-        return self.conn.root.access(path, mode)
+        r = self.conn.root.access(path, mode)
+        print(type(r))
+        return r
 
     chmod = None
     chown = None
@@ -44,7 +46,7 @@ class Passthrough(Operations):
     mknod = None
 
     def rmdir(self, path):
-        print("FileSystem method: rmdir\n")
+        print("FileSystem method: rmdir\n", path)
         return self.conn.root.rmdir(path)
 
     def mkdir(self, path, mode):
@@ -92,7 +94,6 @@ class Passthrough(Operations):
 
 def mount(mountpoint):
     abs_path = os.path.abspath(mountpoint)
-    print(abs_path, os.path.isdir(abs_path))
     if not os.path.isdir(abs_path):
         print("Mount point must be exist")
         sys.exit(0)
@@ -100,7 +101,7 @@ def mount(mountpoint):
         print("Mount point must be empty")
         sys.exit(0)
     
-    FUSE(Passthrough(), mountpoint, nothreads=True, foreground=True)
+    FUSE(Passthrough(), mountpoint, nothreads=True, foreground=True, nonempty=True,)
 
 def usage():
     print(sys.argv[0], "<mount point>")

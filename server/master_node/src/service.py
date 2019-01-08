@@ -101,7 +101,7 @@ class DFSnedir_master_service(rpyc.Service):
 		return conn.root.access(path, mode)
 
 	def exposed_rmdir(self, path):
-		slave = self._find_slave()
+		slave = self._find_slave(path)
 		conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
 		return conn.root.rmdir(path)
 
@@ -116,11 +116,14 @@ class DFSnedir_master_service(rpyc.Service):
 	def exposed_readdir(self, path, fh):
 		self._refresh_slave_dict()
 		slaves = self.slave_server_table.values()
-		directory = []
+		directory = ['.', '..']
 		for slave in slaves:
 			conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
 			content = conn.root.readdir(path, fh)
-			directory.append(c for c in content if c not in directory)
+			for c in content:
+				if c not in directory:
+					directory.append(c)
+			#directory.append(c for c in content if c not in directory)
 		return directory
 
 	def exposed_getattr(self, path, fh=None):
