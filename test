@@ -1,0 +1,25 @@
+cd client
+ls -l
+cd fuse_dir/
+ls
+mkdir nedir1
+ls
+mkdir kadir1
+ls
+mkdir nehir1
+ls
+cd nedir1
+mkdir nedir2
+ls
+mkdir nedir1nehir
+ls
+cd ../kadir1
+ls
+cd kadir2
+ls
+cd ../../
+ls
+touch testfile
+echo "write this" >> testfile
+cat testfile
+rm testfile
