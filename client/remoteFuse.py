@@ -56,20 +56,16 @@ class Passthrough(Operations):
     statfs = None
     unlink = None
     symlink = None
-
-    def rename(self, old, new):
-        print("FileSystem method: rename\n")
-        return self.conn.root.rename(old, new)
-
+    rename = None
     link = None
     utimens = None
 
     # File methods
     # ============
 
-    def open(self, path, flags):
+    def open(self, path, flags, mode=None):
         print("File method: open\n")
-        return self.conn.root.open(path, flags)
+        return self.conn.root.open(path, flags, mode)
 
     def create(self, path, mode, fi=None):
         print("File method: creat\n")
@@ -87,7 +83,7 @@ class Passthrough(Operations):
 
     def flush(self, path, fh):
         print("File method: flush\n")
-        return self.conn.root.fsync(fh)
+        return self.conn.root.flush(path, fh)
 
     release = None
     fsync = None 
