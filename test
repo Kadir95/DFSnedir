@@ -14,10 +14,11 @@ ls
 mkdir nedir1nehir
 ls
 cd ../kadir1
+echo "I'm in kadir1"
 ls
-cd kadir2
+mkdir kadir2
 ls
-cd ../../
+cd ..
 ls
 touch testfile
 echo "write this" >> testfile

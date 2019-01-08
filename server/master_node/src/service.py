@@ -155,3 +155,8 @@ class DFSnedir_master_service(rpyc.Service):
 		slave = self._find_slave(path)
 		conn = self._slave_connect(slave)
 		return conn.root.flush(path, fh)
+	
+	def exposed_close(self, path, fh):
+		slave = self._find_slave(path)
+		conn = self._slave_connect(slave)
+		return conn.root.flush(path, fh)

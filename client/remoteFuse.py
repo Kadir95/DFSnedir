@@ -27,7 +27,7 @@ class Passthrough(Operations):
     # ==================
 
     def access(self, path, mode):
-        print("FileSystem method: access\n")
+        print("FileSystem method: access")
         r = self.conn.root.access(path, mode)
         return 0 # :(
 
@@ -35,25 +35,26 @@ class Passthrough(Operations):
     chown = None
 
     def getattr(self, path, fh=None):
-        print("FileSystem method: getattr\n")
+        print("FileSystem method: getattr")
         return self.conn.root.getattr(path, fh)
 
     def readdir(self, path, fh):
-        print("FileSystem method: readdir\n")
+        print("FileSystem method: readdir")
         return self.conn.root.readdir(path, fh)
 
     readlink = None
     mknod = None
 
     def rmdir(self, path):
-        print("FileSystem method: rmdir\n", path)
+        print("FileSystem method: rmdir", path)
         return self.conn.root.rmdir(path)
 
     def mkdir(self, path, mode):
-        print("FileSystem method: mkdir\n")
+        print("FileSystem method: mkdir")
         return self.conn.root.mkdir(path, mode)
 
-    statfs = None
+    def statfs(self):
+        return None
     unlink = None
     symlink = None
     rename = None
@@ -64,28 +65,31 @@ class Passthrough(Operations):
     # ============
 
     def open(self, path, flags, mode=None):
-        print("File method: open\n")
+        print("File method: open")
         return self.conn.root.open(path, flags, mode)
 
     def create(self, path, mode, fi=None):
-        print("File method: creat\n")
+        print("File method: creat")
         return self.conn.root.open(path, os.O_WRONLY | os.O_CREAT, mode)
 
     def read(self, path, length, offset, fh):
-        print("File method: read\n")
-        return self.conn.root.read(fh, length)
+        print("File method: read")
+        return self.conn.root.read(path, length, offset, fh)
 
     def write(self, path, buf, offset, fh):
-        print("File method: write\n")
-        return self.conn.root.write(fh, buf)
+        print("File method: write")
+        return self.conn.root.write(path, buf, offset, fh)
 
     truncate = None
 
     def flush(self, path, fh):
-        print("File method: flush\n")
+        print("File method: flush")
         return self.conn.root.flush(path, fh)
 
-    release = None
+    def release(self, path, fh):
+        print("File method: release")
+        return self.conn.root.flush(path, fh)
+    
     fsync = None 
 
 def mount(mountpoint):
@@ -97,7 +101,7 @@ def mount(mountpoint):
         print("Mount point must be empty")
         sys.exit(0)
     
-    FUSE(Passthrough(), mountpoint, nothreads=True, foreground=True, nonempty=True,)
+    FUSE(Passthrough(), mountpoint, nothreads=True, foreground=True, nonempty=True)
 
 def usage():
     print(sys.argv[0], "<mount point>")
