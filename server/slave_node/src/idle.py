@@ -57,7 +57,8 @@ def get_slave_stats():
 def foo():
     port = int(os.environ["PORT"])
     rypc_server = ThreadedServer(service.DFSnedir_service, port=port, protocol_config={
-                    "allow_pickle":True
+                    "allow_pickle":True,
+                    "allow_public_attrs":True
                     })
     rypc_server.start()
 

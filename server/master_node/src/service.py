@@ -11,6 +11,7 @@ import os
 import pickle
 import time
 import random
+import pprint
 
 class DFSnedir_master_service(rpyc.Service):
 	def _refresh_slave_dict(self):
@@ -74,7 +75,11 @@ class DFSnedir_master_service(rpyc.Service):
 
 	def exposed_get_slaves(self):
 		self._refresh_slave_dict()
-		return str(self.slave_server_table)
+		return pprint.pformat(self.slave_server_table)
+
+	def exposed_get_file_distribution(self):
+		self._refresh_file_dict()
+		return pprint.pformat(self.file_server_table)
 
 	def exposed_heart_beat(self, slave_stats):
 		self._refresh_slave_dict()
@@ -89,14 +94,6 @@ class DFSnedir_master_service(rpyc.Service):
 			conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
 			result_text += conn.root.echo(text) + "\n"
 		return result_text
-
-	# def exposed_access(self, path, mode):
-	# 	self._refresh_file_dict()
-	# 	slave_machine_list = self.file_server_table[path]
-	# 	slaveID = slave_machine_list[0]
-	# 	slave_machine = self.slave_server_table[slaveID]
-	# 	conn = rpyc.connect(slave_machine["stats"]["ip"], slave_machine["stats"]["port"])
-	# 	return conn.root.access(path, mode)
 
 	def exposed_access(self, path, mode):
 		slave = self._find_slave(path)

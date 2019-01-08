@@ -18,6 +18,10 @@ class DFSnedir_service(rpyc.Service):
 			u_path = u_path[1:]
 		return os.path.join(d_path, u_path)
 
+	def on_connect(self, conn):
+		if not os.path.isdir(d_path):
+			os.makedirs(d_path)
+
 	def exposed_echo(self, text):
 		return text + " //" + os.environ["HOSTNAME"]
 
@@ -64,4 +68,4 @@ class DFSnedir_service(rpyc.Service):
 	def exposed_getattr(self, path, fh=None):
 		a_path = self._abs_path(path)
 		stats = os.lstat(a_path)
-		returndict((key, getattr(stats, key)) for key in ('st_atime', 'st_ctime', 'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
+		return dict((key, getattr(stats, key)) for key in ('st_atime', 'st_ctime', 'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))

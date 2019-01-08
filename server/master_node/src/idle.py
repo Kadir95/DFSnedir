@@ -59,7 +59,8 @@ def foo():
             protocol_config={
                     "slave_dict":slave_dict,
                     "file_dict":file_dict,
-                    "allow_pickle":True
+                    "allow_pickle":True,
+                    "allow_public_attrs":True
                     })
     rypc_server.start()
 
