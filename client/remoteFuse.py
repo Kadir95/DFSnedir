@@ -53,13 +53,19 @@ class Passthrough(Operations):
         print("FileSystem method: mkdir")
         return self.conn.root.mkdir(path, mode)
 
-    def statfs(self):
-        return None
-    unlink = None
+    statfs = None
+    
+    def unlink(self, path):
+        print("FileSystem method: unlink")
+        return self.conn.root.unlink(path)
+
     symlink = None
     rename = None
     link = None
-    utimens = None
+
+    def utimens(self, path, times=None):
+        print("FileSystem method: utimens")
+        return None
 
     # File methods
     # ============
@@ -80,7 +86,9 @@ class Passthrough(Operations):
         print("File method: write")
         return self.conn.root.write(path, buf, offset, fh)
 
-    truncate = None
+    def truncate(self, path, length, fh=None):
+        print("File method: truncate")
+        return self.conn.root.truncate(path, length, fh)
 
     def flush(self, path, fh):
         print("File method: flush")
@@ -90,7 +98,9 @@ class Passthrough(Operations):
         print("File method: release")
         return self.conn.root.flush(path, fh)
     
-    fsync = None 
+    def fsync(self, path, fdatasync, fh):
+        print("File method: fsync")
+        return self.conn.root.fsync(path, fdatasync, fh)
 
 def mount(mountpoint):
     abs_path = os.path.abspath(mountpoint)

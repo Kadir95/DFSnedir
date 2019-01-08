@@ -46,7 +46,11 @@ class DFSnedir_service(rpyc.Service):
 
 	def exposed_flush(self, path, fh):
 		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
-		return os.close(fh)
+		return os.fsync(fh)
+
+	def exposed_fsync(self, path, fdatasync, fh):
+		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
+		return self.exposed_flush(path, fh)
 
 	def exposed_truncate(self, path, length, fh=None):
 		a_path = self._abs_path(path)
