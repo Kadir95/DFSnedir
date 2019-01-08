@@ -100,6 +100,11 @@ class DFSnedir_master_service(rpyc.Service):
 			result_text += conn.root.echo(text) + "\n"
 		return result_text
 
+	def exposed_unlink(self, path):
+		slave = self._find_slave(path)
+		conn = self._slave_connect(slave)
+		return conn.root.unlink(path)
+
 	def exposed_access(self, path, mode):
 		slave = self._find_slave(path)
 		conn = self._slave_connect(slave)
@@ -150,6 +155,12 @@ class DFSnedir_master_service(rpyc.Service):
 		slave = self._find_slave(path)
 		conn = self._slave_connect(slave)
 		return conn.root.write(path, buf, offset, fh)
+
+	def exposed_truncate(self, path, length, fh=None):
+		slave = self._find_slave(path)
+		conn = self._slave_connect(slave)
+		return conn.root.truncate(path, length, fh)
+
 
 	def exposed_flush(self, path, fh):
 		slave = self._find_slave(path)

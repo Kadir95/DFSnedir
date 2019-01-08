@@ -40,10 +40,19 @@ class DFSnedir_service(rpyc.Service):
 		os.lseek(fh, offset, os.SEEK_SET)
 		return os.write(fh, buf)
 
+	def exposed_unlink(self, path):
+		a_path = self._abs_path(path)
+		return os.unlink(a_path)
+
 	def exposed_flush(self, path, fh):
 		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
 		return os.close(fh)
-	
+
+	def exposed_truncate(self, path, length, fh=None):
+		a_path = self._abs_path(path)
+		with open(a_path, 'r+') as f:
+			f.truncate(length)
+
 	def exposed_access(self, path, mode):
 		a_path = self._abs_path(path)
 		return os.access(a_path, mode)

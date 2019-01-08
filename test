@@ -22,5 +22,4 @@ cd ..
 ls
 touch testfile
 echo "write this" >> testfile
-cat testfile
 rm testfile
