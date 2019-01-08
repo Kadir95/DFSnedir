@@ -25,37 +25,9 @@ class DFSnedir_service(rpyc.Service):
 	def exposed_echo(self, text):
 		return text + " //" + os.environ["HOSTNAME"]
 
-	def exposed_open(self, path, flags, mode):
-		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
-		a_path = self._abs_path(path)
-		return os.open(a_path, flags)
-	
-	def exposed_read(self, path, length, offset, fh):
-		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
-		os.lseek(fh, offset, os.SEEK_SET)
-		return os.read(fh, length)
-	
-	def exposed_write(self, path, buf, offset, fh):
-		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
-		os.lseek(fh, offset, os.SEEK_SET)
-		return os.write(fh, buf)
-
-	def exposed_unlink(self, path):
-		a_path = self._abs_path(path)
-		return os.unlink(a_path)
-
-	def exposed_flush(self, path, fh):
-		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
-		return os.fsync(fh)
-
-	def exposed_fsync(self, path, fdatasync, fh):
-		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
-		return self.exposed_flush(path, fh)
-
-	def exposed_truncate(self, path, length, fh=None):
-		a_path = self._abs_path(path)
-		with open(a_path, 'r+') as f:
-			f.truncate(length)
+	# -------------------------------
+	# ----- File system methods -----
+	# -------------------------------
 
 	def exposed_access(self, path, mode):
 		a_path = self._abs_path(path)
@@ -79,3 +51,38 @@ class DFSnedir_service(rpyc.Service):
 		stats = os.lstat(a_path)
 		return dict((key, getattr(stats, key)) for key in ('st_atime', 'st_ctime', 'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
 
+	def exposed_unlink(self, path):
+		a_path = self._abs_path(path)
+		return os.unlink(a_path)
+
+	# ------------------------------
+	# -------- File methods --------
+	# ------------------------------
+
+	def exposed_open(self, path, flags, mode):
+		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
+		a_path = self._abs_path(path)
+		return os.open(a_path, flags)
+	
+	def exposed_read(self, path, length, offset, fh):
+		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
+		os.lseek(fh, offset, os.SEEK_SET)
+		return os.read(fh, length)
+	
+	def exposed_write(self, path, buf, offset, fh):
+		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
+		os.lseek(fh, offset, os.SEEK_SET)
+		return os.write(fh, buf)
+
+	def exposed_truncate(self, path, length, fh=None):
+		a_path = self._abs_path(path)
+		with open(a_path, 'r+') as f:
+			f.truncate(length)
+
+	def exposed_flush(self, path, fh):
+		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
+		return os.fsync(fh)
+
+	def exposed_fsync(self, path, fdatasync, fh):
+		# if a slave closes when file is reading. It will be an error (fh file descriptor just exist on the slave not all!)
+		return self.exposed_flush(path, fh)
