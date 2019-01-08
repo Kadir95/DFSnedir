@@ -69,3 +69,4 @@ class DFSnedir_service(rpyc.Service):
 		a_path = self._abs_path(path)
 		stats = os.lstat(a_path)
 		return dict((key, getattr(stats, key)) for key in ('st_atime', 'st_ctime', 'st_gid', 'st_mode', 'st_mtime', 'st_nlink', 'st_size', 'st_uid'))
+

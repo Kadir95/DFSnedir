@@ -59,11 +59,16 @@ class DFSnedir_master_service(rpyc.Service):
 		slaves = self.slave_server_table.keys()
 		return random.choice(list(slaves))
 
+	def _slave_connect(self, slave):
+		return rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
+
+
 	def on_connect(self, conn):
 		self.slave_server_table_file = conn._config["slave_dict"]
 		self.file_server_table_file = conn._config["file_dict"]
 		self._refresh_slave_dict()
 		self._refresh_file_dict()
+
 
 	def exposed_echo(self, text):
 		return str(text) + " //From docker"
@@ -91,25 +96,25 @@ class DFSnedir_master_service(rpyc.Service):
 		slaves_list = self.slave_server_table.values()
 		result_text = ""
 		for slave in slaves_list:
-			conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
+			conn = self._slave_connect(slave)
 			result_text += conn.root.echo(text) + "\n"
 		return result_text
 
 	def exposed_access(self, path, mode):
 		slave = self._find_slave(path)
-		conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
+		conn = self._slave_connect(slave)
 		return conn.root.access(path, mode)
 
 	def exposed_rmdir(self, path):
 		slave = self._find_slave(path)
-		conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
+		conn = self._slave_connect(slave)
 		return conn.root.rmdir(path)
 
 	def exposed_mkdir(self, path, mode):
 		slaveID = self._select_rand_slaveID()
 		self.file_server_table[path] = [slaveID]
 		slave = self.slave_server_table[slaveID]
-		conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
+		conn = self._slave_connect(slave)
 		self._flush_file_dict()
 		return conn.root.mkdir(path, mode)
 
@@ -118,7 +123,7 @@ class DFSnedir_master_service(rpyc.Service):
 		slaves = self.slave_server_table.values()
 		directory = ['.', '..']
 		for slave in slaves:
-			conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
+			conn = self._slave_connect(slave)
 			content = conn.root.readdir(path, fh)
 			for c in content:
 				if c not in directory:
@@ -128,5 +133,11 @@ class DFSnedir_master_service(rpyc.Service):
 
 	def exposed_getattr(self, path, fh=None):
 		slave = self._find_slave(path)
-		conn = rpyc.connect(slave["stats"]["ip"], slave["stats"]["port"])
+		conn = self._slave_connect(slave)
 		return conn.root.getattr(path, fh)
+
+	def exposed_open(self, path, flags):
+		slave = self._find_slave(path)
+		conn = self._slave_connect(slave)
+		return conn.root.open(path, flags)
+
