@@ -4,8 +4,3 @@ docker run --network nedir_network --ip 172.20.0.2 dfsnedir_master &
 cd ../slave_node
 docker build -t dfsnedir_slave -f Dockerfile .
 docker run --network nedir_network --ip 172.20.0.3 dfsnedir_slave &
-sleep 1
-docker run --network nedir_network --ip 172.20.0.4 dfsnedir_slave &
-sleep 1
-docker run --network nedir_network --ip 172.20.0.5 dfsnedir_slave &
-cd ../../

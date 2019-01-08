@@ -6,6 +6,7 @@ import os
 import sys
 import errno
 import rpyc
+import ctypes
 
 from fuse import FUSE, FuseOSError, Operations
 
@@ -28,8 +29,7 @@ class Passthrough(Operations):
     def access(self, path, mode):
         print("FileSystem method: access\n")
         r = self.conn.root.access(path, mode)
-        print(type(r))
-        return r
+        return 0 # :(
 
     chmod = None
     chown = None
